@@ -1,0 +1,10 @@
+hello_domain_list_title     = REDAXO-Projekte
+hello_domain_column_domain  = Projekt hinzufügen
+hello_domain_column_domain_note  = Haupt-Domain der REDAXO-Installation hinzufügen
+
+hello_domain_column_api_key = API-Key
+hello_domain_column_api_key_note = API-Key, z.B. {1}
+hello_domain_norows_message = Keine REDAXO-Installation eingerichtet
+
+hello_domain_text_add   = Projekt hinzufügen
+hello_domain_text_edit  = Projekt bearbeiten
