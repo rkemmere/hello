@@ -1,0 +1,26 @@
+package: hello
+version: '0.1alpha'
+title: 'translate:title'
+author: 'Pixelfirma, alexplus_de, pixeldaniel'
+supportpage: 'https://github.com/alexplusde/hello/'
+icon: fa-smile-o
+
+requires:
+    redaxo: ^5.4.0
+    packages:
+        cronjob: '^2.0'
+page:
+    title: 'translate:title'
+    pjax: false
+    icon: rex-icon fa-smile-o
+
+pages:
+    hello/settings:
+        title: 'translate:hello_settings_title'
+        pjax: false
+        icon: rex-icon fa-smile-o
+    hello/docs:
+        title: 'translate:hello_docs'
+        pjax: false
+        icon: rex-icon fa-smile-o
+        itemclass: pull-right 
