@@ -1,5 +1,5 @@
 package: hello
-version: '0.1alpha'
+version: '0.1.2alpha'
 title: 'translate:title'
 author: 'Pixelfirma, alexplus_de, pixeldaniel'
 supportpage: 'https://github.com/alexplusde/hello/'
@@ -15,8 +15,8 @@ page:
     icon: rex-icon fa-smile-o
 
 pages:
-    hello/settings:
-        title: 'translate:hello_settings_title'
+    system/hello:
+        title: 'translate:title'
         pjax: false
         icon: rex-icon fa-smile-o
     hello/docs:
