@@ -84,6 +84,12 @@ class rex_api_hello extends rex_api_function
 
             # / SYSLOG
 
+            # CONFIG.YML
+
+            $params['config'] = rex_path::coreData('config.yml');
+            // TODO: Datenbank-Passwort kürzen
+
+            # / CONFIG.YML
 
         } else {
             $params['status']       = 0;
