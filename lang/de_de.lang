@@ -1,7 +1,11 @@
-hello = Hello - Status der REDAXO-Installation an einen Server übermitteln
-title = Hello
+hello_hello = Hello - Status der REDAXO-Installation an einen Server übermitteln
+hello_title = Hello
 
 hello_settings_title = Einstellungen
+hello_docs = Hilfe
+
+hello_docs_navigation = Navigation
+
 
 hello_api_key_notice = Mit diesem Schlüssel kann der Status der REDAXO-Installation abgerufen werden.
 hello_api_key_label = Secret
