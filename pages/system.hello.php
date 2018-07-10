@@ -16,7 +16,7 @@ $content = '';
 $formElements = [];
 $n = [];
 $n['label'] = '<label for="hello_api_key">' . $this->i18n('hello_api_key_label') . '</label>';
-$n['field'] = '<input id="hello_api_key" name="settings[hello_api_key]" value="'.$this->getConfig('hello_api_key') . '" />';
+$n['field'] = '<input id="hello_api_key" name="settings[hello_api_key]" class="form-control" value="'.$this->getConfig('hello_api_key') . '" />';
 $n['note'] = $this->i18n('hello_api_key_notice');
 $formElements[] = $n;
 
