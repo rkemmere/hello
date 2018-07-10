@@ -59,11 +59,11 @@ $item = array_shift(rex_sql::factory()->setDebug(0)->getArray($query, [$domain])
 $raw = json_decode($item['raw'], true);
 
 
-$output = '<table>';
+$output = '<table class="table table-striped"><thead><tr><th>Version</th><th>Details</th></tr></thead><tbody>';
     $output .= '<tr><td>Hello-Version</td><td>'.$raw['hello_version'].'</td></tr>';
     $output .= '<tr><td>REDAXO-Version</td><td>'.$raw['rex_version'].'</td></tr>';
     $output .= '<tr><td>PHP-Version</td><td>'.$raw['php_version'].'</td></tr>';
-$output .= '</table>';
+    $output .= '</tbody></table>';
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'danger', false);
@@ -74,7 +74,7 @@ $content3 .= '<div class="col-md-6">'.$fragment->parse('core/page/section.php').
 
 $domains = $raw['domains'];
 
-$output = '<table>';
+$output = '<table class="table table-striped"><thead><tr><th>Domain</th><th>URL</th><th>404</th></tr></thead><tbody>';
 foreach($domains as $key => $value) {
     $output .= '<tr>';
     $output .= '<td>'.$value['name'].'</td>';
@@ -82,7 +82,7 @@ foreach($domains as $key => $value) {
     $output .= '<td>'.$value['url_404'].'</td>';
     $output .= '</tr>';
 } 
-$output .= '</table>';
+$output .= '</tbody></table>';
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'info', false);
@@ -92,41 +92,49 @@ $content3 .= '<div class="col-md-6">'.$fragment->parse('core/page/section.php').
 
 $addons = $raw['rex_addons'];
 
-$output = '<table>';
+$output = '<table class="table table-striped"><thead><tr><th>Name</th><th>installiert?</th><th>aktiv?</th><th>Version</th><th>Installer</th></tr></thead><tbody>';
 foreach($addons as $key => $value) {
     $output .= '<tr>';
     $output .= '<td>'.$value['name'].'</td>';
     $output .= '<td>'.$value['install'].'</td>';
     $output .= '<td>'.$value['status'].'</td>';
-    $output .= '<td>'.$value['version_current'].'</td>';
+    if($value['version_current'] != $value['version_latest']) {
+        $output .= '<td><i title="" class="rex-icon fa-exclamation-triangle"></i> '.$value['version_current'].'</td>';
+    } else {
+        $output .= '<td>'.$value['version_current'].'</td>';
+    }
     $output .= '<td>'.$value['version_latest'].'</td>';
     $output .= '</tr>';
 } 
-$output .= '</table>';
+$output .= '</tbody></table>';
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'info', false);
 $fragment->setVar('title', "Details zu ".$domain, false);
 $fragment->setVar('body', $output, false);
-$content3 .= '<div class="col-md-6">'.$fragment->parse('core/page/section.php').'</div>';
+$content3 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
 
 $syslog = $raw['syslog'];
 
 
-$output = '<table>';
-foreach($syslog as $key => $value) {
+$output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
+for ($i = 0; $i < count($syslog)-5; $i++) {
     $output .= '<tr>';
-    $output .= '<td>'.key($value).'</td>';
-    $output .= '<td>'.array_shift($value).'</td>';
+    $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+    $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+    $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+    $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+    $output .= '<td>'.array_shift($syslog[$i]).'</td>';
     $output .= '</tr>';
+    
 } 
-$output .= '</table>';
+$output .= '</tbody></table>';
 
 $fragment = new rex_fragment();
 $fragment->setVar('class', 'info', false);
 $fragment->setVar('title', "Syslog", false);
 $fragment->setVar('body', $output, false);
-$content3 .= '<div class="col-md-6">'.$fragment->parse('core/page/section.php').'</div>';
+$content3 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
 
 
 echo '<div class="row">'.$content3."</div>";
