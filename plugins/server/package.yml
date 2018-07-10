@@ -16,3 +16,6 @@ pages:
     hello/server-edit:
         title: 'Server'
         icon: rex-icon fa-smile-o
+    hello/server-details:
+        title: 'Details'
+        icon: rex-icon fa-smile-o
