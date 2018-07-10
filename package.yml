@@ -1,12 +1,12 @@
 package: hello
-version: '0.1.3alpha'
+version: '0.1.4alpha'
 title: 'translate:title'
 author: 'Pixelfirma, alexplus_de, pixeldaniel'
 supportpage: 'https://github.com/alexplusde/hello/'
 icon: fa-smile-o
 
 requires:
-    redaxo: ^5.4.0
+    redaxo: ^5.6.0
     packages:
         cronjob: '^2.0'
 page:
