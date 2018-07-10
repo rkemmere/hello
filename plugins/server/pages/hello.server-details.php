@@ -53,7 +53,7 @@ $content = '
     echo $content;
 
 // Domain-Übersicht ANFANG //
-$query = 'SELECT * FROM `rex_hello_domain_log` WHERE domain = ?';
+$query = 'SELECT * FROM `rex_hello_domain_log` WHERE domain = ? ORDER BY id DESC LIMIT 1';
 $item = array_shift(rex_sql::factory()->setDebug(0)->getArray($query, [$domain]));
 
 $raw = json_decode($item['raw'], true);
