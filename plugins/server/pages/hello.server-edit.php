@@ -15,7 +15,7 @@ if (($func == '') || $func == "domain_delete") {
     }	
 
     // Domain-Übersicht ANFANG //
-    $query = 'SELECT id, domain, api_key FROM `rex_hello_domain` ORDER BY domain';
+    $query = 'SELECT id, domain, api_key, rex_version, php_version, hello_version, updatedate AS logdate FROM `rex_hello_domain` ORDER BY domain';
     $list = rex_list::factory($query);
     $list->addTableAttribute('class', 'table-striped');
     $list->setNoRowsMessage($this->i18n('hello_domain_norows_message'));
@@ -26,10 +26,13 @@ if (($func == '') || $func == "domain_delete") {
     $list->addColumn($thIcon, $tdIcon, 0, ['<th class="rex-table-icon">###VALUE###</th>', '<td class="rex-table-icon">###VALUE###</td>']);
     $list->setColumnParams($thIcon, ['func' => 'domain_edit', 'id' => '###id###','start' => $start]);
     
-    $list->setColumnLabel('domain', $this->i18n('hello_domain_column_domain'));
+    $list->setColumnLabel('domain', $this->i18n('project'));
     $list->setColumnParams('domain', ['id' => '###id###', 'func' => 'domain_edit']);
         
-    $list->setColumnLabel('api_key', $this->i18n('hello_domain_column_api_key'));
+    $list->setColumnLabel('api_key', $this->i18n('api_key'));
+    $list->setColumnLabel('rex_version', $this->i18n('rex_version'));
+    $list->setColumnLabel('php_version', $this->i18n('php_version'));
+    $list->setColumnLabel('hello_version', $this->i18n('hello_version'));
 
     $list->setColumnLabel('logdate', $this->i18n('hello_domain_column_last_call'));
     $list->setColumnFormat('logdate', 'custom', function ($params) {
