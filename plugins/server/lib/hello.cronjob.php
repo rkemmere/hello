@@ -39,11 +39,14 @@ class rex_cronjob_hello extends rex_cronjob
             curl_multi_remove_handle($multi_curl, $response);
             //curl_close($response);
 
-            $json = json_decode($resp);
+            $json = json_decode($resp, true);
 
             if(json_last_error() === JSON_ERROR_NONE) {
                 rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 1, $resp] );
-            } else {
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET hello_version = ? WHERE domain = ?", [$json['hello_version'], $key]); 
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET rex_version = ? WHERE domain = ?", [$json['rex_version'], $key]); 
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET php_version = ? WHERE domain = ?", [$json['php_version'], $key]); 
+                } else {
                 rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 0, $resp] );
             }
             rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$key]); 
