@@ -1,5 +1,5 @@
 package: hello
-version: '0.1.5alpha'
+version: '0.1.6alpha'
 title: 'translate:title'
 author: 'Pixelfirma, alexplus_de, pixeldaniel'
 supportpage: 'https://github.com/alexplusde/hello/'
