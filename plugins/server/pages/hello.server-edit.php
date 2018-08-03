@@ -15,21 +15,30 @@ if (($func == '') || $func == "domain_delete") {
     }	
 
     // Domain-Übersicht ANFANG //
-    $query = 'SELECT id, domain, api_key, rex_version, php_version, hello_version, updatedate AS logdate FROM `rex_hello_domain` ORDER BY domain';
+    // Felder: id, domain, api_key, rex_version, php_version, hello_version
+    $query = 'SELECT *, updatedate AS logdate FROM `rex_hello_domain` ORDER BY domain';
     $list = rex_list::factory($query);
     $list->addTableAttribute('class', 'table-striped');
     $list->setNoRowsMessage($this->i18n('hello_domain_norows_message'));
     
     // icon column (Domain hinzufügen bzw. bearbeiten)
-    $thIcon = '<a href="'.$list->getUrl(['func' => 'domain_add','start' => $start]).'"><i class="rex-icon rex-icon-add-action"></i></a>';
-    $tdIcon = '<i class="rex-icon fa-file-text-o"></i>';
+    $thIcon = '<a href="'.$list->getUrl(['func' => 'domain_add','start' => $start]).'"><i class="rex-icon rex-icon-structure-root-level"></i></a>';
+    $tdIcon = '<i class="rex-icon rex-icon-structure-root-level"></i>';
     $list->addColumn($thIcon, $tdIcon, 0, ['<th class="rex-table-icon">###VALUE###</th>', '<td class="rex-table-icon">###VALUE###</td>']);
     $list->setColumnParams($thIcon, ['func' => 'domain_edit', 'id' => '###id###','start' => $start]);
-    
-    $list->setColumnLabel('domain', $this->i18n('project'));
-    $list->setColumnParams('domain', ['id' => '###id###', 'func' => 'domain_edit']);
-        
+            
+    $list->addColumn($this->i18n('Details'), '###domain###', 3);
+    $list->setColumnParams($this->i18n('Details'), ['data_id' => '###id###', 'func' => 'domain_details', 'domain' => '###domain###']);
+
     $list->setColumnLabel('api_key', $this->i18n('api_key'));
+    $list->setColumnFormat('api_key', 'custom', function ($params) {
+        return '<a href="?page=hello/server-edit&id='.$params['list']->getValue('id').'&domain='.$params['list']->getValue('domain').'&func=domain_edit"><span class="rex-icon fa-edit"></span> '.substr($params['list']->getValue('api_key'),0,10)."...".'</a>';
+
+    });
+
+
+    $list->setColumnLabel('domain', $this->i18n('project'));
+        
     $list->setColumnLabel('rex_version', $this->i18n('rex_version'));
     $list->setColumnLabel('php_version', $this->i18n('php_version'));
     $list->setColumnLabel('hello_version', $this->i18n('hello_version'));
@@ -47,7 +56,18 @@ if (($func == '') || $func == "domain_delete") {
     $list->setColumnParams('domain_delete', ['func' => 'domain_delete', 'oid' => '###id###', 'domain' => '###domain###','start' => $start]);
     $list->addLinkAttribute('domain_delete', 'data-confirm', $this->i18n('hello_domain_delete_confirm'));
 
+    $list->setColumnSortable('rex_version');
+    $list->setColumnSortable('hello_version');
+    $list->setColumnSortable('php_version');
+    $list->setColumnSortable('http_code');
+    $list->setColumnSortable('is_ssl');
+    $list->setColumnSortable('status');
+    $list->setColumnSortable('logdate');
+
+
     $list->removeColumn('id');
+    $list->removeColumn('domain');
+    $list->removeColumn('createdate');
     $list->removeColumn('updatedate');
     
     $content1 = $list->get();

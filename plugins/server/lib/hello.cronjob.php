@@ -8,12 +8,13 @@ class rex_cronjob_hello extends rex_cronjob
 
         $domains = rex_sql::factory()->setDebug(0)->getArray("SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 50"); 
 
+        /* Hello Addon-Abruf */
         $multi_curl = curl_multi_init();
         $resps = array();
         $options = array(
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_AUTOREFERER    => true, 
-            CURLOPT_HEADER         => false,
+            CURLOPT_HEADER         => true,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 1000
@@ -31,13 +32,17 @@ class rex_cronjob_hello extends rex_cronjob
         do {
             curl_multi_exec($multi_curl, $active);
         } while ($active > 0);
+        
+        while ($curl_handle = curl_multi_info_read($multi_curl)) {
+            $info = curl_getinfo($curl_handle['handle']);
+            $host = ltrim(parse_url($info['url'], PHP_URL_HOST), 'www.');
+            $meta[$host] = $info;
+        }
 
-         
         foreach ($resps as $key => $response) {
 
             $resp = curl_multi_getcontent($response);
             curl_multi_remove_handle($multi_curl, $response);
-            //curl_close($response);
 
             $json = json_decode($resp, true);
 
@@ -49,7 +54,13 @@ class rex_cronjob_hello extends rex_cronjob
                 } else {
                 rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 0, $resp] );
             }
-            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$key]); 
+        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET http_code = ? WHERE domain = ?", [$meta[$key]['http_code'], $key]); 
+        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [0, $key]); 
+        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET ip = ? WHERE domain = ?", [$meta[$key]['primary_ip'], $key]); 
+        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$key]); 
+            
+
+
         }
         
         curl_multi_close($multi_curl);

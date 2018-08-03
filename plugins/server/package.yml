@@ -19,3 +19,6 @@ pages:
     hello/server-details:
         title: 'Details'
         icon: rex-icon fa-smile-o
+    hello/server-settings:
+        title: 'translate:settings'
+        icon: rex-icon rex-icon-system

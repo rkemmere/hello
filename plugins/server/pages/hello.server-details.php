@@ -140,6 +140,31 @@ $content = $fragment->parse('core/page/section.php');
 
 
     echo '<div class="row">'.$content3."</div>";
-    // Domain bearbeiten ENDE //
+
+
+        
+    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
+    for ($i = 0; $i < count($syslog)-5; $i++) {
+        $output .= '<tr>';
+        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
+        $output .= '<td>'.array_shift($syslog[$i]).'</td>';
+        $output .= '</tr>';
+        
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Syslog", false);
+    $fragment->setVar('body', $output, false);
+    $content4 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
+
+
+    echo '<div class="row">'.$content4."</div>";
+    
     }
 }
+
