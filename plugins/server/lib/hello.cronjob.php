@@ -14,7 +14,8 @@ class rex_cronjob_hello extends rex_cronjob
         $options = array(
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_AUTOREFERER    => true, 
-            CURLOPT_HEADER         => true,
+            CURLOPT_MAXREDIRS    => 4, 
+            CURLOPT_HEADER         => false,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => 1000
@@ -37,7 +38,7 @@ class rex_cronjob_hello extends rex_cronjob
             $info = curl_getinfo($curl_handle['handle']);
             $host = ltrim(parse_url($info['url'], PHP_URL_HOST), 'www.');
             $meta[$host] = $info;
-        }
+        } 
 
         foreach ($resps as $key => $response) {
 
