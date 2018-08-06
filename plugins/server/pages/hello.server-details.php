@@ -52,7 +52,7 @@ $content = $fragment->parse('core/page/section.php');
         echo $content;
 
 
-        if($domain) {
+    if($domain) {
     // Domain-Übersicht ANFANG //
     $query = 'SELECT * FROM `rex_hello_domain_log` WHERE domain = ? ORDER BY id DESC LIMIT 1';
     $item = array_shift(rex_sql::factory()->setDebug(0)->getArray($query, [$domain]));
@@ -141,7 +141,7 @@ $content = $fragment->parse('core/page/section.php');
 
     echo '<div class="row">'.$content3."</div>";
 
-
+    // TODO: Weitere Werte ausgeben
         
     $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
     for ($i = 0; $i < count($syslog)-5; $i++) {
@@ -163,7 +163,7 @@ $content = $fragment->parse('core/page/section.php');
     $content4 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
 
 
-    echo '<div class="row">'.$content4."</div>";
+    # echo '<div class="row">'.$content4."</div>";
     
     }
 }
