@@ -9,8 +9,12 @@
 }
 
 if (rex_addon::get('cronjob')->isAvailable()) {
-   rex_cronjob_manager::registerType('rex_cronjob_hello_favicon');
-}
+    rex_cronjob_manager::registerType('rex_cronjob_hello_favicon');
+ }
+
+ if (rex_addon::get('cronjob')->isAvailable()) {
+    rex_cronjob_manager::registerType('rex_cronjob_hello_pagespeed');
+ }
 
 rex_view::addCssFile( $this->getAssetsUrl('css/theme.default.min.css') );
 rex_view::addJsFile( $this->getAssetsUrl('js/jquery.tablesorter.combined.min.js') );
