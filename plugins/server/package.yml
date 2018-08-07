@@ -13,11 +13,9 @@ page:
 
 pages:
     hello/server-edit:
-        title: 'Server'
-        icon: rex-icon fa-smile-o
+        title: '👋 Server'
     hello/server-details:
-        title: 'Details'
-        icon: rex-icon fa-smile-o
+        title: '👋 Details'
     hello/server-settings:
         title: 'translate:settings'
         icon: rex-icon rex-icon-system
