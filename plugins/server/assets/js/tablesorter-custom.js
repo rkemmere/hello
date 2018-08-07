@@ -1,3 +1,6 @@
 $(document).on('rex:ready', function (event, container) {
-    $("table").tablesorter({ theme : 'default' });
+   $(".hello-tablesorter").tablesorter({ 
+       theme : 'bootstrap', 
+       widthFixed: true
+    });
 });
