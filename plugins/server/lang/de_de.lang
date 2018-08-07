@@ -11,9 +11,14 @@ hello_domain_column_delete = Löschen
 hello_domain_text_add   = Projekt hinzufügen
 hello_domain_text_edit  = Projekt bearbeiten
 
-php_version     = PHP-Version
-hello_version   = PHP-Version
-rex_version     = REDAXO-Version
+domain          = Domain
+php_version     = PHP
+hello_version   = Hello
+rex_version     = CMS
 http_code       = HTTP-Code
 is_ssl          = SSL-Status
 ip              = IP
+api_key         = Schlüssel
+paket           = Net-Build
+gsc_domains     = Searchconsole
+in_dnsklix      = DNSKlix
