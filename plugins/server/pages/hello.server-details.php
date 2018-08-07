@@ -43,9 +43,10 @@ $content = $fragment->parse('core/page/section.php');
 
         
     $content = '
-    <form id="rex-form-system-setup" action="' . rex_url::currentBackendPage() . '" method="post">
-        <input type="hidden" name="func" value="updateinfos" />
-        ' . $csrfToken->getHiddenField() . '
+    <form id="rex-form-system-setup" action="' . rex_url::currentBackendPage() . '" method="get">
+    <input type="hidden" name="func" value="updateinfos" />
+    <input type="hidden" name="page" value="hello/server-details" />
+    ' . $csrfToken->getHiddenField() . '
         ' . $content . '
     </form>';
 
@@ -116,19 +117,77 @@ $content = $fragment->parse('core/page/section.php');
     $fragment->setVar('body', $output, false);
     $content3 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
 
+    echo '<div class="row">'.$content3."</div>";
+    $content3 = "";    
+
+    $user = $raw['user'];
+    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
+    foreach ($user as $login) {
+        $output .= '<tr>';
+        $output .= '<td>'.$login[0].'</td>';
+        $output .= '<td>'.$login[1].'</td>';
+        $output .= '<td>'.$login[2].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Benutzer", false);
+    $fragment->setVar('body', $output, false);
+    $content4 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+    
+    $article = $raw['article'];
+    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
+    foreach ($user as $login) {
+        $output .= '<tr>';
+        $output .= '<td>'.$login[0].'</td>';
+        $output .= '<td>'.$login[1].'</td>';
+        $output .= '<td>'.$login[2].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Artikel", false);
+    $fragment->setVar('body', $output, false);
+    $content5 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+
+    $media = $raw['media'];
+    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th></tr></thead><tbody>';
+    foreach ($media as $file) {
+        $output .= '<tr>';
+        $output .= '<td>'.$file[0].'</td>';
+        $output .= '<td>'.$file[1].'</td>';
+        $output .= '<td>'.$file[2].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Medienpool", false);
+    $fragment->setVar('body', $output, false);
+    $content6 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+
+
+    echo '<div class="row">'.$content4.$content5.$content6."</div>";
+    
+
+    
     $syslog = $raw['syslog'];
 
 
     $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
-    for ($i = 0; $i < count($syslog)-5; $i++) {
+    foreach ($syslog as $entry) {
         $output .= '<tr>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i]).'</td>';
+        $output .= '<td>'.$entry[0].'</td>';
+        $output .= '<td>'.$entry[1].'</td>';
+        $output .= '<td>'.$entry[2].'</td>';
+        $output .= '<td>'.$entry[3].'</td>';
+        $output .= '<td>'.$entry[4].'</td>';
         $output .= '</tr>';
-        
     } 
     $output .= '</tbody></table>';
 
@@ -140,31 +199,8 @@ $content = $fragment->parse('core/page/section.php');
 
 
     echo '<div class="row">'.$content3."</div>";
-
     // TODO: Weitere Werte ausgeben
-        
-    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
-    for ($i = 0; $i < count($syslog)-5; $i++) {
-        $output .= '<tr>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i++]).'</td>';
-        $output .= '<td>'.array_shift($syslog[$i]).'</td>';
-        $output .= '</tr>';
-        
-    } 
-    $output .= '</tbody></table>';
 
-    $fragment = new rex_fragment();
-    $fragment->setVar('class', 'info', false);
-    $fragment->setVar('title', "Syslog", false);
-    $fragment->setVar('body', $output, false);
-    $content4 .= '<div class="col-md-12">'.$fragment->parse('core/page/section.php').'</div>';
-
-
-    # echo '<div class="row">'.$content4."</div>";
-    
     }
 }
 
