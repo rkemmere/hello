@@ -5,6 +5,9 @@ author: 'alexplus_de'
 supportpage: 'https://github.com/alexplusde/hello/'
 icon: fa-smile-o
 
+requires:
+    php:
+        extensions: [curl]
 page:
     hidden: true
 
