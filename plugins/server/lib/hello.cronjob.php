@@ -47,16 +47,22 @@ class rex_cronjob_hello extends rex_cronjob
 
             $json = json_decode($resp, true);
 
-            if(json_last_error() === JSON_ERROR_NONE) {
+            if(json_last_error() === JSON_ERROR_NONE && count($json)) {
                 rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 1, $resp] );
                 rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET hello_version = ? WHERE domain = ?", [$json['hello_version'], $key]); 
                 rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET rex_version = ? WHERE domain = ?", [$json['rex_version'], $key]); 
                 rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET php_version = ? WHERE domain = ?", [$json['php_version'], $key]); 
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [$json['status'], $key]); 
                 } else {
-                rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 0, $resp] );
+                rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, -1, $resp] );
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [-1, $key]); 
             }
         rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET http_code = ? WHERE domain = ?", [$meta[$key]['http_code'], $key]); 
-        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [0, $key]); 
+        if($meta[$key]['primary_port'] === 443) {
+            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [1, $key]); 
+        } else {
+            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [-1, $key]); 
+        }
         rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET ip = ? WHERE domain = ?", [$meta[$key]['primary_ip'], $key]); 
         rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$key]); 
             
