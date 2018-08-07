@@ -11,12 +11,14 @@ hello_domain_column_delete = Löschen
 hello_domain_text_add   = Projekt hinzufügen
 hello_domain_text_edit  = Projekt bearbeiten
 
+hello_settings = Einstellungen
+
 domain          = Domain
 php_version     = PHP
 hello_version   = Hello
 rex_version     = CMS
 http_code       = HTTP-Code
-is_ssl          = SSL-Status
+is_ssl          = SSL
 ip              = IP
 api_key         = Schlüssel
 paket           = Net-Build
