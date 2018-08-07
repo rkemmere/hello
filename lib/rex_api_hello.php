@@ -73,13 +73,15 @@ class rex_api_hello extends rex_api_function
 
             $log = new rex_log_file(rex_path::coreData('system.log'));
 
+            $i = 0;
             foreach (new LimitIterator($log, 0, 30) as $entry) {
                 $data = $entry->getData();
-                $params['syslog'][]['timestamp'] = $entry->getTimestamp('%d.%m.%Y %H:%M:%S');
-                $params['syslog'][]['syslog_type'] = $data[0];
-                $params['syslog'][]['syslog_message'] = $data[1];
-                $params['syslog'][]['syslog_file'] = (isset($data[2]) ? $data[2] : '');
-                $params['syslog'][]['syslog_line'] = (isset($data[3]) ? $data[3] : '');
+                $params['syslog'][$i]['timestamp'] = $entry->getTimestamp('%d.%m.%Y %H:%M:%S');
+                $params['syslog'][$i]['syslog_type'] = $data[0];
+                $params['syslog'][$i]['syslog_message'] = $data[1];
+                $params['syslog'][$i]['syslog_file'] = (isset($data[2]) ? $data[2] : '');
+                $params['syslog'][$i]['syslog_line'] = (isset($data[3]) ? $data[3] : '');
+                $i++;
             }
 
             # / SYSLOG
@@ -91,10 +93,25 @@ class rex_api_hello extends rex_api_function
 
             # / CONFIG.YML
 
+
+            # USER 
+            $params['user'] = rex_sql::factory()->getArray('SELECT `id`, `name`, `descrption`, `login`, `email`, `status`, `admin`, `lasttrydate`, `lastlogin` FROM rex_user ORDER BY `admin`, `id`');
+            # / USER
+
+            # TODO: Letzte Artikel 
+            $params['article'] = rex_sql::factory()->getArray('SELECT `name`, `updateuser`, `updatedate`, `pid` FROM `rex_article` ORDER BY `updatedate` DESC LIMIT 5');
+            # / Letzte Artikel
+
+            # TODO: Letzte Medien
+            $params['media'] = rex_sql::factory()->getArray('SELECT `filename`, `updateuser`, `updatedate` FROM `rex_media` ORDER BY `updatedate` DESC LIMIT 5');
+            # / Letzte Medien
+
         } else {
             $params['status']       = 0;
             $params['message'][]    = "Falscher API-Schlüssel.";
         }
+
+        // TODO: EP, um weitere Parameter einzuhängen
         
         header('Content-Type: application/json; charset=UTF-8');  
         $hello = json_encode($params, true);
