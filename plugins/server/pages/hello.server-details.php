@@ -93,6 +93,67 @@ $content = $fragment->parse('core/page/section.php');
     $fragment->setVar('body', $output, false);
     $content3 .= '<div class="col-md-6">'.$fragment->parse('core/page/section.php').'</div>';
 
+    echo '<div class="row">'.$content3.'</div>';
+    $content3 = "";
+
+    
+    $user = $raw['user'];
+    $output = '<table class="table table-striped"><thead><tr><th>Name</th><th>Benutzer</th><th>Letzter Login</th></tr></thead><tbody>';
+    foreach ($user as $login) {
+        $output .= '<tr>';
+        $output .= '<td>'.$login["name"].'</td>';
+        $output .= '<td>'.$login["login"].'</td>';
+        $output .= '<td>'.$login["admin"].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Benutzer", false);
+    $fragment->setVar('body', $output, false);
+    $content4 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+    
+    $article = $raw['article'];
+
+    $output = '<table class="table table-striped"><thead><tr><th>Artikel</th><th>Benutzer</th><th>Änderungsdatum</th></tr></thead><tbody>';
+    foreach ($article as $item) {
+        $output .= '<tr>';
+        $output .= '<td>'.$item["name"].'</td>';
+        $output .= '<td>'.$item["updateuser"].'</td>';
+        $output .= '<td>'.$item["updatedate"].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Artikel", false);
+    $fragment->setVar('body', $output, false);
+    $content5 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+
+    $media = $raw['media'];
+    $output = '<table class="table table-striped"><thead><tr><th>Datei</th><th>Benutzer</th><th>Änderungsdatum</th></tr></thead><tbody>';
+    foreach ($media as $file) {
+        $output .= '<tr>';
+        $output .= '<td>'.$file["filename"].'</td>';
+        $output .= '<td>'.$file["updateuser"].'</td>';
+        $output .= '<td>'.$file["updatedate"].'</td>';
+        $output .= '</tr>';
+    } 
+    $output .= '</tbody></table>';
+
+    $fragment = new rex_fragment();
+    $fragment->setVar('class', 'info', false);
+    $fragment->setVar('title', "Medienpool", false);
+    $fragment->setVar('body', $output, false);
+    $content6 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
+
+
+    echo '<div class="row">'.$content4.$content5.$content6."</div>";
+    
+
+
     $addons = $raw['rex_addons'];
 
     $output = '<table class="table table-striped"><thead><tr><th>Name</th><th>installiert?</th><th>aktiv?</th><th>Version</th><th>Installer</th></tr></thead><tbody>';
@@ -120,73 +181,17 @@ $content = $fragment->parse('core/page/section.php');
     echo '<div class="row">'.$content3."</div>";
     $content3 = "";    
 
-    $user = $raw['user'];
-    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
-    foreach ($user as $login) {
-        $output .= '<tr>';
-        $output .= '<td>'.$login[0].'</td>';
-        $output .= '<td>'.$login[1].'</td>';
-        $output .= '<td>'.$login[2].'</td>';
-        $output .= '</tr>';
-    } 
-    $output .= '</tbody></table>';
-
-    $fragment = new rex_fragment();
-    $fragment->setVar('class', 'info', false);
-    $fragment->setVar('title', "Benutzer", false);
-    $fragment->setVar('body', $output, false);
-    $content4 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
-    
-    $article = $raw['article'];
-    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
-    foreach ($user as $login) {
-        $output .= '<tr>';
-        $output .= '<td>'.$login[0].'</td>';
-        $output .= '<td>'.$login[1].'</td>';
-        $output .= '<td>'.$login[2].'</td>';
-        $output .= '</tr>';
-    } 
-    $output .= '</tbody></table>';
-
-    $fragment = new rex_fragment();
-    $fragment->setVar('class', 'info', false);
-    $fragment->setVar('title', "Artikel", false);
-    $fragment->setVar('body', $output, false);
-    $content5 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
-
-    $media = $raw['media'];
-    $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th></tr></thead><tbody>';
-    foreach ($media as $file) {
-        $output .= '<tr>';
-        $output .= '<td>'.$file[0].'</td>';
-        $output .= '<td>'.$file[1].'</td>';
-        $output .= '<td>'.$file[2].'</td>';
-        $output .= '</tr>';
-    } 
-    $output .= '</tbody></table>';
-
-    $fragment = new rex_fragment();
-    $fragment->setVar('class', 'info', false);
-    $fragment->setVar('title', "Medienpool", false);
-    $fragment->setVar('body', $output, false);
-    $content6 .= '<div class="col-md-4">'.$fragment->parse('core/page/section.php').'</div>';
-
-
-    echo '<div class="row">'.$content4.$content5.$content6."</div>";
-    
-
     
     $syslog = $raw['syslog'];
-
 
     $output = '<table class="table table-striped"><thead><tr><th>Zeitstempel</th><th>Typ</th><th>Nachricht</th><th>Datei</th><th>Zeile</th></tr></thead><tbody>';
     foreach ($syslog as $entry) {
         $output .= '<tr>';
-        $output .= '<td>'.$entry[0].'</td>';
-        $output .= '<td>'.$entry[1].'</td>';
-        $output .= '<td>'.$entry[2].'</td>';
-        $output .= '<td>'.$entry[3].'</td>';
-        $output .= '<td>'.$entry[4].'</td>';
+        $output .= '<td>'.$entry["timestamp"].'</td>';
+        $output .= '<td>'.$entry["syslog_type"].'</td>';
+        $output .= '<td>'.$entry["syslog_message"].'</td>';
+        $output .= '<td>'.$entry["syslog_file"].'</td>';
+        $output .= '<td>'.$entry["syslog_line"].'</td>';
         $output .= '</tr>';
     } 
     $output .= '</tbody></table>';
