@@ -95,7 +95,7 @@ class rex_api_hello extends rex_api_function
 
 
             # USER 
-            $params['user'] = rex_sql::factory()->getArray('SELECT `id`, `name`, `descrption`, `login`, `email`, `status`, `admin`, `lasttrydate`, `lastlogin` FROM rex_user ORDER BY `admin`, `id`');
+            $params['user'] = rex_sql::factory()->getArray('SELECT `name`, `login`, `email`, `status`, `admin`, `lasttrydate`, `lastlogin` FROM rex_user ORDER BY `admin`, `id`');
             # / USER
 
             # TODO: Letzte Artikel 

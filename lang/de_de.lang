@@ -1,11 +1,15 @@
 hello_hello = Hello - Status der REDAXO-Installation an einen Server übermitteln
 hello_title = Hello
 
-hello_settings_title = Einstellungen
-hello_docs = Hilfe
+hello_settings_title = 👋 Einstellungen
+hello_docs = 👋 Hilfe
 
 hello_docs_navigation = Navigation
 
 
 hello_api_key_notice = Mit diesem Schlüssel kann der Status der REDAXO-Installation abgerufen werden.
 hello_api_key_label = Secret
+
+hello_google_api_key_title = Google APIs
+hello_google_api_key_label = API-Schlüssel
+hello_google_api_key_notice = Abrufbar unter https://console.developers.google.com/apis, dort die PageSpeed Insights API aktivieren
