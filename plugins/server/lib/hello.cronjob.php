@@ -23,7 +23,7 @@ class rex_cronjob_hello extends rex_cronjob
 
         foreach($domains as $domain) {
             $i = $domain['domain'];
-            $url = $domain['domain']."/?rex-api-call=hello&api_key=".$domain['api_key'];
+            $url = $domain['domain']."/hello.php?rex-api-call=hello&api_key=".$domain['api_key'];
             $resps[$i] = curl_init($url);
             curl_setopt_array($resps[$i], $options);
             curl_multi_add_handle($multi_curl, $resps[$i]);
