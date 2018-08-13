@@ -6,7 +6,7 @@ class rex_cronjob_hello extends rex_cronjob
     public function execute()
     {
 
-        $domains = rex_sql::factory()->setDebug(0)->getArray('SELECT * FROM rex_hello_domain WHERE ip != "" ORDER BY updatedate asc LIMIT 50'); 
+        $domains = rex_sql::factory()->setDebug(0)->getArray('SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 50'); 
 
         /* Hello Addon-Abruf */
         $multi_curl = curl_multi_init();
