@@ -88,7 +88,7 @@ class rex_api_hello extends rex_api_function
 
             # CONFIG.YML
 
-            $params['config'] = file_get_contents(rex_path::coreData('config.yml'));
+            $params['config'] = rex_path::coreData('config.yml');
             // TODO: Datenbank-Passwort kürzen
 
             # / CONFIG.YML
