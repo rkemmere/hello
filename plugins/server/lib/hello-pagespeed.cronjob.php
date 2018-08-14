@@ -6,13 +6,13 @@ class rex_cronjob_hello_pagespeed extends rex_cronjob
     public function execute()
     {
 
-        $domains = rex_sql::factory()->setDebug(0)->getArray('SELECT D.domain AS domain FROM
+        $websites = rex_sql::factory()->setDebug(0)->getArray('SELECT D.domain AS domain FROM
         (SELECT domain, createdate FROM `rex_hello_domain_psi`) AS PSI
         RIGHT JOIN
         (SELECT domain, updatedate FROM rex_hello_domain WHERE ip != "") AS D
         ON
         PSI.domain = D.DOMAIN
-        ORDER BY PSI.createdate ASC LIMIT 30'); 
+        ORDER BY PSI.createdate ASC LIMIT 5'); 
         $multi_curl = curl_multi_init();
         $resps = array();
 
@@ -27,17 +27,21 @@ class rex_cronjob_hello_pagespeed extends rex_cronjob
         );
         $fstreams = array();
 
-        foreach($domains as $domain) {
-            $i = $domain['domain'];
-            if($domain['is_ssl']) {
+        foreach($websites as $website) {
+            $domain = $website['domain'];
+            if($website['is_ssl']) {
                 $prefix = "https://www.";
             } else {
                 $prefix = "http://www.";
             }
-            $url = 'https://www.googleapis.com/pagespeedonline/v4/runPagespeed?filter_third_party_resources=false&locale=de_DE&screenshot=true&snapshots=false&strategy=desktop&key='.rex_config::get('hello/server', 'hello_google_api_key').'&url='.urlencode($prefix.$domain['domain']);
-            $resps[$i] = curl_init($url);
-            curl_setopt_array($resps[$i], $options);
-            curl_multi_add_handle($multi_curl, $resps[$i]);
+            $url_desktop = 'https://www.googleapis.com/pagespeedonline/v4/runPagespeed?filter_third_party_resources=false&locale=de_DE&screenshot=true&snapshots=false&strategy=desktop&key='.rex_config::get('hello/server', 'hello_google_api_key').'&url='.urlencode($prefix.$website['domain']);
+            $url_mobile = 'https://www.googleapis.com/pagespeedonline/v4/runPagespeed?filter_third_party_resources=false&locale=de_DE&screenshot=true&snapshots=false&strategy=mobile&key='.rex_config::get('hello/server', 'hello_google_api_key').'&url='.urlencode($prefix.$website['domain']);
+            $resps[$domain.";desktop"] = curl_init($url_desktop);
+            $resps[$domain.";mobile"] = curl_init($url_mobile);
+            curl_setopt_array($resps[$domain.";desktop"], $options);
+            curl_setopt_array($resps[$domain.";mobile"], $options);
+            curl_multi_add_handle($multi_curl, $resps[$domain.";desktop"]);
+            curl_multi_add_handle($multi_curl, $resps[$domain.";mobile"]);
         }
         $active = null;
         do {
@@ -46,6 +50,8 @@ class rex_cronjob_hello_pagespeed extends rex_cronjob
 
    
         foreach ($resps as $key => $response) {
+            $domain = explode(";", $key)[0];
+            $mode = explode(";", $key)[1];
             $resp = curl_multi_getcontent($response);
             curl_multi_remove_handle($multi_curl, $response);
 
@@ -55,8 +61,15 @@ class rex_cronjob_hello_pagespeed extends rex_cronjob
             // echo '<img src="' . $img . '" />';
 
             if(json_last_error() === JSON_ERROR_NONE && !is_array($pagespeed['error'])) {
-                rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_psi (`domain`, `raw`, `createdate`, `score_desktop`, `score_mobile`) VALUES(:domain, :resp, NOW(), :score_desktop, :score_mobile) 
-                ON DUPLICATE KEY UPDATE domain = :domain, `raw` = :resp, createdate = NOW(), `score_desktop` = :score_desktop, `score_mobile` = :score_mobile', [":domain" => $key, ":resp" => $resp, ":score_desktop" => $pagespeed['ruleGroups']["SPEED"]["score"], ":score_mobile" => 0] );
+                if($mode == "desktop") {
+                    rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_psi (`domain`, `raw`, `createdate`, `score_desktop`) VALUES(:domain, :resp, NOW(), :score_desktop) 
+                    ON DUPLICATE KEY UPDATE domain = :domain, `raw` = :resp, createdate = NOW(), `score_desktop` = :score_desktop', [":domain" => $domain, ":resp" => $resp, ":score_desktop" => $pagespeed['ruleGroups']["SPEED"]["score"]] );
+                } else  if($mode == "mobile") {
+                    rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_psi (`domain`, `raw`, `createdate`, `score_mobile`) VALUES(:domain, :resp, NOW(), :score_mobile) 
+                    ON DUPLICATE KEY UPDATE domain = :domain, `raw` = :resp, createdate = NOW(), `score_mobile` = :score_mobile', [":domain" => $domain, ":resp" => $resp, ":score_mobile" => $pagespeed['ruleGroups']["SPEED"]["score"]] );
+                }
+            } else {
+                return false;
             }
         }
 
