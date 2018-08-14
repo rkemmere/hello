@@ -12,8 +12,18 @@ page:
     hidden: true
 
 pages:
-    hello/server-edit:
+    hello/server:
         title: '👋 Server'
+    hello/server/list:
+        title: '👋 Übersicht'
+    hello/server/addons:
+        title: '👋 Addons'
+    hello/server/hosting:
+        title: '👋 Hosting'
+    hello/server/seo:
+        title: '👋 SEO'
+    hello/server/health:
+        title: '👋 Health'
     hello/server-details:
         title: '👋 Details'
     hello/server-settings:

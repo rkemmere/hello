@@ -20,19 +20,9 @@ if (($func == '') || $func == "domain_delete") {
     ON D.ip = MX.IpAddress
 LEFT JOIN (SELECT * FROM `rex_hello_domain_netbuild` ORDER BY domain) as NBP
     ON D.domain = NBP.domain
-LEFT JOIN (SELECT domain, score_desktop AS psi_score_desktop, score_mobile AS psi_score_mobile FROM `rex_hello_domain_psi` WHERE id IN (SELECT MAX(id) FROM rex_hello_domain_psi GROUP BY domain)) as PSI
-    ON D.domain = PSI.domain
-    LEFT JOIN (SELECT domain, 1 AS in_dnsklix FROM rex_hello_pixelfirma_dnsklix) AS PXDNS
-    ON D.domain = PXDNS.domain
     LEFT JOIN (SELECT domain, `raw` as log_raw FROM rex_hello_domain_log WHERE id IN (SELECT MAX(id) FROM rex_hello_domain_log GROUP BY domain)) AS HLOG
     ON D.domain = HLOG.domain
-LEFT JOIN (SELECT 
-SUM(IF(siteUrl = CONCAT("http://",domain,"/"),1,0)) AS gsc_has_http, 
-SUM(IF(siteUrl = CONCAT("http://www.",domain,"/"),1,0)) AS gsc_has_http_www, 
-SUM(IF(siteUrl = CONCAT("https://",domain,"/"),1,0)) AS gsc_has_https, 
-SUM(IF(siteUrl = CONCAT("https://www.",domain,"/"),1,0)) AS gsc_has_https_www, 
-domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain ORDER BY domain) as GSC
-    ON D.domain = GSC.domain';
+    ORDER BY D.domain, D.ip';
     $list = rex_list::factory($query, 1000);
     $list->addTableAttribute('class', 'table-striped');
     $list->setNoRowsMessage($this->i18n('hello_domain_norows_message'));
@@ -150,58 +140,6 @@ domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain
         }
     });
 
-    
-    $list->setColumnLabel('in_dnsklix', $this->i18n('in_dnsklix'));
-    $list->setColumnLayout('in_dnsklix', ['<th data-sorter="digit">###VALUE###</th>', '<td>###VALUE###</td>']);
-    $list->setColumnFormat('in_dnsklix', 'custom', function ($params) {
-        if (!$params['list']->getValue('in_dnsklix')) { 
-            return "";
-        } else if ($params['list']->getValue('in_dnsklix') == "1") {
-            return '<span class="rex-icon fa-check text-success"></span>';
-        } else { 
-            return "?";
-        }
-    });
-
-    $list->setColumnLabel('gsc_domains', $this->i18n('gsc_domains'));
-    $list->setColumnLayout('gsc_domains', ['<th data-sorter="false"><span class="rex-icon fa-google"></span> Search Console</th>', '<td>###VALUE###</td>']);
-    $list->setColumnFormat('gsc_domains', 'custom', function ($params) {
-        if($params['list']->getValue('ip')) {
-            $gsc_check = '<a href="https://www.google.com/webmasters/tools/home?hl=de" target="_blank">';        
-        }
-        if($params['list']->getValue('gsc_has_http')) {
-            $gsc_check .= '<span class="rex-icon fa-check text-success"></span>';
-        } else {
-            $gsc_check .= '<span class="rex-icon fa-exclamation-triangle text-danger"></span>';
-        }
-        if($params['list']->getValue('gsc_has_http_www')) {
-            $gsc_check .= '<span class="rex-icon fa-check text-success"></span>';
-        } else {
-            $gsc_check .= '<span class="rex-icon fa-exclamation-triangle text-danger"></span>';
-        }
-
-        if ($params['list']->getValue('is_ssl') == 1) {
-            if($params['list']->getValue('gsc_has_https')) {
-                $gsc_check .= '<span class="rex-icon fa-check text-success"></span>';
-            } else {
-                $gsc_check .= '<span class="rex-icon fa-exclamation-triangle text-danger"></span>';
-            }
-            if($params['list']->getValue('gsc_has_https_www')) {
-                $gsc_check .= '<span class="rex-icon fa-check text-success"></span>';
-            } else {
-                $gsc_check .= '<span class="rex-icon fa-exclamation-triangle text-danger"></span>';
-            }
-        } else { 
-            $gsc_check .= '';
-        }
-
-        if($params['list']->getValue('ip')) {
-            $gsc_check .= '</a>';
-        }
-        
-        return $gsc_check;
-    });
-
     $list->setColumnLabel('logdate', $this->i18n('hello_domain_column_last_call'));
     $list->setColumnLayout('logdate', ['<th sorter="shortDate" data-date-format="dd.mm.yyyy">###VALUE###</th>', '<td>###VALUE###</td>']);
     $list->setColumnFormat('logdate', 'custom', function ($params) {
@@ -212,66 +150,8 @@ domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain
         }
     });
 
-    $list->addColumn("Pagespeed", false, -1, ['<th class="rex-table-icon"><span class="rex-icon fa-google"></span> PageSpeed</th>', '<td>###VALUE###</td>']);
-    $list->setColumnFormat("Pagespeed", 'custom', function ($params) {
-        if($params['list']->getValue('ip')) {
-            if($params['list']->getValue('psi_score_desktop') < 70) {
-                $return = '<span class="rex-icon fa-desktop text-danger"></span> '.$params['list']->getValue('psi_score_desktop');
-            } else if($params['list']->getValue('psi_score_desktop') < 90) {
-                $return = '<span class="rex-icon fa-desktop text-warning"></span> '.$params['list']->getValue('psi_score_desktop');
-            } else {
-                $return = '<span class="rex-icon fa-desktop text-success"></span> '.$params['list']->getValue('psi_score_desktop');
-            }
-            $return .= " | ";
-            if($params['list']->getValue('psi_score_mobile') < 70) {
-                $return .= '<span class="rex-icon fa-mobile text-danger"></span> '.$params['list']->getValue('psi_score_mobile');
-            } else if($params['list']->getValue('psi_score_mobile') < 90) {
-                $return .= '<span class="rex-icon fa-mobile text-warning"></span> '.$params['list']->getValue('psi_score_mobile');
-            } else {
-                $return .= '<span class="rex-icon fa-mobile text-success"></span> '.$params['list']->getValue('psi_score_mobile');
-            }
-            return $return;
-        }
-    });
-
-    $list->addColumn("dsgvo_version", false, -1, ['<th class="rex-table-icon">###VALUE###</th>', '<td>###VALUE###</td>']);
-    $list->setColumnLabel('dsgvo_version', $this->i18n('DSGVO'));
-    $list->setColumnFormat("dsgvo_version", 'custom', function ($params) {
-        if($params['list']->getValue('log_raw')) {
-            $log = json_decode($params['list']->getValue('log_raw'), true);
-            if(json_last_error() === JSON_ERROR_NONE) {
-                if(rex_string::versionCompare($log["rex_addons"]['dsgvo']['version_current'], $log["rex_addons"]['dsgvo']['version_latest'], '<')) {
-                    return '<i title="" class="rex-icon fa-exclamation-triangle"></i> '.$log["rex_addons"]['dsgvo']['version_current'];
-                } else if (rex_string::versionCompare($log["cms_version"], "5", '>')) {
-                    return '<i title="" class="rex-icon fa-exclamation-triangle"></i> ohne';
-                }  else {
-                    return $log["rex_addons"]['dsgvo']['version_current'];
-                }        
-            } else {
-                return "";
-            }
-        }
-    });
-    $list->addColumn("debug_mode", false, -1, ['<th class="rex-table-icon">###VALUE###</th>', '<td>###VALUE###</td>']);
-    $list->setColumnLabel('debug_mode', $this->i18n('Debug-Mode'));
-    $list->setColumnFormat("debug_mode", 'custom', function ($params) {
-        if($params['list']->getValue('log_raw')) {
-            $log = json_decode($params['list']->getValue('log_raw'), true);
-            if(json_last_error() === JSON_ERROR_NONE) {
-                $config = rex_string::yamlDecode($log["config"]);
-                if(isset($config["debug"]["enabled"]) && $config["debug"]["enabled"] == "enabled") {
-                    return '<i title="" class="rex-icon fa-check text-danger"></i> '.$config["debug"]["enabled"].'';
-                } else if(isset($config["debug"]["enabled"])) {
-                    return '<span class="rex-icon fa-check text-success"></span>';
-                } else {
-                    return "?";
-                }
-            } else {
-                return "";
-            }
-        }
-    });
     $list->addColumn("hello_message", false, -1, ['<th class="rex-table-icon">###VALUE###</th>', '<td>###VALUE###</td>']);
+    $list->setColumnLabel('hello_message', $this->i18n('hello_message'));
     $list->setColumnFormat("hello_message", 'custom', function ($params) {
         if($params['list']->getValue('log_raw')) {
             $log = json_decode($params['list']->getValue('log_raw'), true);
@@ -294,7 +174,9 @@ domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain
 
 
     $list->removeColumn('id');
+    $list->removeColumn('alias_id');
     $list->removeColumn('domain');
+    $list->removeColumn('debug_mode');
     $list->removeColumn('createdate');
     $list->removeColumn('updatedate');
     $list->removeColumn('IpAddress');
@@ -305,8 +187,8 @@ domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain
     $list->removeColumn('gsc_has_https');
     $list->removeColumn('gsc_has_https_www');
     $list->removeColumn('psi_score_desktop');
-    $list->removeColumn('log_raw');
     $list->removeColumn('psi_score_mobile');
+    $list->removeColumn('log_raw');
 
     $content1 = $list->get();
     $content1 = str_replace('<table class="', '<table class="hello-tablesorter ', $content1);    
@@ -339,23 +221,27 @@ domain, count(domain) AS gsc_domains FROM `rex_hello_domain_gsc` GROUP BY domain
     $field = $form->addTextField('domain');
     $field->setLabel($this->i18n('hello_domain_column_domain'));
     $field->setNotice($this->i18n('hello_domain_column_domain_note'));
+    $field->getValidator()->add('notEmpty', $this->i18n('hello_column_domain_empty'));
     //End - add domain-field
 
     //Start - add domain-field
     $field = $form->addTextField('api_key');
     $field->setLabel($this->i18n('hello_domain_column_api_key'));
     $field->setNotice($this->i18n('hello_domain_column_api_key_note', md5(time())));
+    $field->getValidator()->add('notEmpty', $this->i18n('hello_column_api_key_empty'));
+
+
     //End - add domain-field
 
     //Start - add alias-field
     $field = $form->addSelectField('alias_id','',['class'=>'form-control selectpicker']); 
-    $field->setLabel($this->i18n('dsgvo_server_text_column_domain'));
+    $field->setLabel($this->i18n('hello_column_alias'));
     $select = $field->getSelect();
     $select->setSize(1);
+    $select->addOption("Bitte wählen", "");
     $select->addDBSqlOptions('select domain as name, id as id FROM rex_hello_domain WHERE alias_id = "" ORDER BY domain');
     $select->setSelected($domain);
-    $field->setNotice($this->i18n('dsgvo_server_text_column_domain_note'));
-    $field->getValidator()->add('notEmpty', '');
+    $field->setNotice($this->i18n('hello_column_alias_note'));
     //End - add domain-field
 
     if ($func == 'domain_edit') {

@@ -1,9 +1,14 @@
 hello_domain_list_title     = REDAXO-Projekte
 hello_domain_column_domain  = Projekt
 hello_domain_column_domain_note  = Haupt-Domain der REDAXO-Installation hinzufügen
+hello_column_domain_empty = Bitte Domain eintragen
 
-hello_domain_column_api_key = API-Key
-hello_domain_column_api_key_note = API-Key, z.B. {1}
+hello_domain_column_api_key = API-Schlüssel
+hello_domain_column_api_key_note = API-Schlüssel, z.B. <code>{0}</code>
+hello_column_api_key_empty = Bitte den vorgeschlagenen API-Schlüssel eintragen
+
+hello_column_alias = Alias-Domain
+hello_column_alias_note = z.B. Weiterleitung auf Haupt-Domain, Park-Domain, etc.
 hello_domain_norows_message = Keine REDAXO-Installation eingerichtet
 
 hello_domain_column_last_call = Letzter Abruf 
@@ -16,7 +21,8 @@ hello_settings = Einstellungen
 domain          = Domain
 php_version     = PHP
 hello_version   = Hello
-rex_version     = CMS
+cms             = CMS
+cms_version     = Version
 http_code       = HTTP-Code
 is_ssl          = SSL
 ip              = IP
@@ -24,3 +30,6 @@ api_key         = Schlüssel
 paket           = Net-Build
 gsc_domains     = Searchconsole
 in_dnsklix      = DNSKlix
+DSGVO           = DSGVO-Addon
+debug_mode      = REDAXO Debug-Modus
+hello_message   = Benachrichtigung
