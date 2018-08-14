@@ -96,6 +96,29 @@ LEFT JOIN (SELECT * FROM `rex_hello_domain_netbuild` ORDER BY domain) as NBP
         }
     });
 
+    $list->addColumn("updates", false, -1, ['<th class="rex-table-icon">###VALUE###</th>', '<td>###VALUE###</td>']);
+    $list->setColumnLabel("updates", ($addon));
+    $list->setColumnFormat("updates", 'custom', function ($params) {
+        $addon = $params['field'];
+        if($params['list']->getValue('log_raw')) {
+            $log = json_decode($params['list']->getValue('log_raw'), true);
+            if(json_last_error() === JSON_ERROR_NONE && $log["rex_addons"] && count($log["rex_addons"])) {
+                $i = 0;
+                $j = 0;
+                foreach($log["rex_addons"] as $addon) {
+                    if(rex_string::versionCompare($addon['version_current'], $addon['version_latest'], '<')) {
+                        $i++;
+                    } else {
+                        $j++;
+                    }        
+                }
+                return $i ."&nbsp;Updates";
+            } else {
+                return "";
+            }
+        }
+    });
+
     $list->setColumnLabel('hello_version', $this->i18n('hello_version'));
     $list->setColumnLayout('hello_version', ['<th data-sorter="digit">###VALUE###</th>', '<td>###VALUE###</td>']);
 
@@ -168,11 +191,11 @@ LEFT JOIN (SELECT * FROM `rex_hello_domain_netbuild` ORDER BY domain) as NBP
     });
 
     
-    $list->addColumn('domain_delete', '<i class="rex-icon rex-icon-delete"></i> ' . $this->i18n('hello_domain_column_delete'), -1, ['', '<td class="rex-table-action">###VALUE###</td>']);
+    $list->addColumn('domain_delete', '<i class="rex-icon rex-icon-delete"></i> ' . $this->i18n('hello_domain_column_delete'), -1, ['<th></th>', '<td class="rex-table-action">###VALUE###</td>']);
     $list->setColumnParams('domain_delete', ['func' => 'domain_delete', 'oid' => '###id###', 'domain' => '###domain###','start' => $start]);
     $list->addLinkAttribute('domain_delete', 'data-confirm', $this->i18n('hello_domain_delete_confirm'));
 
-
+    
     $list->removeColumn('id');
     $list->removeColumn('alias_id');
     $list->removeColumn('domain');
