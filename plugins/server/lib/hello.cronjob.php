@@ -6,7 +6,7 @@ class rex_cronjob_hello extends rex_cronjob
     public function execute()
     {
 
-        $domains = rex_sql::factory()->setDebug(0)->getArray('SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 50'); 
+        $websites = rex_sql::factory()->setDebug(0)->getArray('SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 25'); 
 
         /* Hello Addon-Abruf */
         $multi_curl = curl_multi_init();
@@ -21,12 +21,16 @@ class rex_cronjob_hello extends rex_cronjob
             CURLOPT_TIMEOUT => 1000
         );
 
-        foreach($domains as $domain) {
-            $i = $domain['domain'];
-            $url = $domain['domain']."/hello.php?rex-api-call=hello&api_key=".$domain['api_key'];
-            $resps[$i] = curl_init($url);
-            curl_setopt_array($resps[$i], $options);
-            curl_multi_add_handle($multi_curl, $resps[$i]);
+        foreach($websites as $website) {
+            $domain = $website['domain'];
+            $url_hello = $domain."/hello.php?rex-api-call=hello&api_key=".$website['api_key'];
+            $url_domain = $domain."/";
+            $resps[$domain.";hello"] = curl_init($url_hello);
+            $resps[$domain.";domain"] = curl_init($url_domain);
+            curl_setopt_array($resps[$domain.";hello"], $options);
+            curl_setopt_array($resps[$domain.";domain"], $options);
+            curl_multi_add_handle($multi_curl, $resps[$domain.";hello"]);
+            curl_multi_add_handle($multi_curl, $resps[$domain.";domain"]);
         }
         $active = null;
         do {
@@ -41,29 +45,37 @@ class rex_cronjob_hello extends rex_cronjob
 
         foreach ($resps as $key => $response) {
 
+            $domain = explode(";", $key)[0];
+            $mode = explode(";", $key)[1];
+
             $resp = curl_multi_getcontent($response);
             curl_multi_remove_handle($multi_curl, $response);
 
             $json = json_decode($resp, true);
 
-            if(json_last_error() === JSON_ERROR_NONE && count($json)) {
-                rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, 1, $resp] );
-                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET hello_version = ? WHERE domain = ?", [$json['hello_version'], $key]); 
-                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET rex_version = ? WHERE domain = ?", [$json['rex_version'], $key]); 
-                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET php_version = ? WHERE domain = ?", [$json['php_version'], $key]); 
-                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [$json['status'], $key]); 
+            if($mode == "hello") {
+                if(json_last_error() === JSON_ERROR_NONE && $json !== null) {
+                    rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$domain, 1, $resp] );
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET hello_version = ? WHERE domain = ?", [$json['hello_version'], $domain]); 
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET cms_version = ? WHERE domain = ?", [$json['cms_version'], $domain]); 
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET cms = ? WHERE domain = ?", [$json['cms'], $domain]); 
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET php_version = ? WHERE domain = ?", [$json['php_version'], $domain]); 
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [$json['status'], $domain]); 
+                    } else {
+                    rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$domain, -1, $resp] );
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [-1, $domain]); 
+                }
+            } else if($mode == "domain") {
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET http_code = ? WHERE domain = ?", [$meta[$domain]['http_code'], $domain]); 
+                if($meta[$key]['primary_port'] === 443) {
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [1, $domain]); 
                 } else {
-                rex_sql::factory()->setDebug(0)->setQuery('INSERT INTO rex_hello_domain_log (`domain`, `status`, `createdate`, `raw`) VALUES(?,?,NOW(),?)', [$key, -1, $resp] );
-                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET status = ? WHERE domain = ?", [-1, $key]); 
+                    rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [-1, $domain]); 
+                }
+                rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET ip = ? WHERE domain = ?", [$meta[$domain]['primary_ip'], $domain]); 
             }
-        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET http_code = ? WHERE domain = ?", [$meta[$key]['http_code'], $key]); 
-        if($meta[$key]['primary_port'] === 443) {
-            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [1, $key]); 
-        } else {
-            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET is_ssl = ? WHERE domain = ?", [-1, $key]); 
-        }
-        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET ip = ? WHERE domain = ?", [$meta[$key]['primary_ip'], $key]); 
-        rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$key]); 
+
+            rex_sql::factory()->setDebug(0)->setQuery("UPDATE rex_hello_domain SET updatedate = NOW() WHERE domain = ?", [$domain]); 
             
 
 
