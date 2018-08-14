@@ -6,7 +6,7 @@ class rex_cronjob_hello_favicon extends rex_cronjob
     public function execute()
     {
 
-        $domains = rex_sql::factory()->setDebug(0)->getArray("SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 300"); 
+        $domains = rex_sql::factory()->setDebug(0)->getArray("SELECT * FROM rex_hello_domain ORDER BY updatedate asc LIMIT 100"); 
         $multi_curl = curl_multi_init();
         $ch = [];
 
