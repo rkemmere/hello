@@ -20,6 +20,8 @@ class rex_api_hello extends rex_api_function
 
             $params['hello_version']    = rex_addon::get('hello')->getProperty('version');
             $params['rex_version']      = rex::getVersion();
+            $params['cms']              = "REDAXO";
+            $params['cms_version']      = rex::getVersion();
             $params['php_version']      = phpversion();
             $params['status']           = 1;
 
